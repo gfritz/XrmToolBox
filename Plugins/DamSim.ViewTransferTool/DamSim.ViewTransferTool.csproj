@@ -77,6 +77,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CrmExceptionHelper.cs" />
+    <Compile Include="DelegatesHelpers\CheckBoxDelegates.cs" />
+    <Compile Include="DelegatesHelpers\ComboboxDelegates.cs" />
     <Compile Include="DelegatesHelpers\CommonDelegates.cs" />
     <Compile Include="DelegatesHelpers\GroupBoxDelegates.cs" />
     <Compile Include="DelegatesHelpers\ListViewDelegates.cs" />

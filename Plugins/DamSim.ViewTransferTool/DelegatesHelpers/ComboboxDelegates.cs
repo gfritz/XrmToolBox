@@ -26,6 +26,23 @@ namespace Tanguy.WinForm.Utilities.DelegatesHelpers
             }
         }
 
+        public static void AddRange(ComboBox combobox, object[] items)
+        {
+            MethodInvoker miAddRange = delegate
+            {
+                combobox.Items.AddRange(items);
+            };
+
+            if (combobox.InvokeRequired)
+            {
+                combobox.Invoke(miAddRange);
+            }
+            else
+            {
+                miAddRange();
+            }
+        }
+
         public static void InsertItem(ComboBox combobox, int index, object item)
         {
             MethodInvoker miInsertItem = delegate
@@ -134,6 +151,44 @@ namespace Tanguy.WinForm.Utilities.DelegatesHelpers
             }
 
             return selectedItem;
+        }
+
+        public static int GetIndexOf(ComboBox combobox, object item)
+        {
+            int index = -1;
+
+            MethodInvoker miGetIndexOf = delegate
+            {
+                index = combobox.Items.IndexOf(item);
+            };
+
+            if (combobox.InvokeRequired)
+            {
+                combobox.Invoke(miGetIndexOf);
+            }
+            else
+            {
+                miGetIndexOf();
+            }
+
+            return index;
+        }
+
+        public static void SetSelectedIndex(ComboBox combobox, int index)
+        {
+            MethodInvoker miSetSelectedIndex = delegate
+            {
+                combobox.SelectedIndex = index;
+            };
+
+            if (combobox.InvokeRequired)
+            {
+                combobox.Invoke(miSetSelectedIndex);
+            }
+            else
+            {
+                miSetSelectedIndex();
+            }
         }
 
         public static string GetText(ComboBox combobox)

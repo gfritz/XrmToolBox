@@ -35,10 +35,16 @@
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.gbSourceViews = new System.Windows.Forms.GroupBox();
+            this.gbFilters = new System.Windows.Forms.GroupBox();
+            this.lblUserFilter = new System.Windows.Forms.Label();
+            this.cboUserFilter = new System.Windows.Forms.ComboBox();
+            this.cboViewClasses = new System.Windows.Forms.ComboBox();
+            this.chkShowActiveViews = new System.Windows.Forms.CheckBox();
             this.lvSourceViews = new System.Windows.Forms.ListView();
             this.allViewName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.allViewType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.allViewIsActive = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.allViewOwner = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tsMain = new System.Windows.Forms.ToolStrip();
             this.tsbCloseThisTab = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -56,13 +62,11 @@
             this.lbTarget = new System.Windows.Forms.Label();
             this.gbSourceViewLayout = new System.Windows.Forms.GroupBox();
             this.lvSourceViewLayoutPreview = new System.Windows.Forms.ListView();
-            this.gbFilters = new System.Windows.Forms.GroupBox();
-            this.chkShowActiveViews = new System.Windows.Forms.CheckBox();
             this.gbEntities.SuspendLayout();
             this.gbSourceViews.SuspendLayout();
+            this.gbFilters.SuspendLayout();
             this.tsMain.SuspendLayout();
             this.gbSourceViewLayout.SuspendLayout();
-            this.gbFilters.SuspendLayout();
             this.SuspendLayout();
             // 
             // gbEntities
@@ -118,10 +122,63 @@
             this.gbSourceViews.Font = new System.Drawing.Font("Segoe UI", 8.25F);
             this.gbSourceViews.Location = new System.Drawing.Point(292, 85);
             this.gbSourceViews.Name = "gbSourceViews";
-            this.gbSourceViews.Size = new System.Drawing.Size(505, 251);
+            this.gbSourceViews.Size = new System.Drawing.Size(505, 287);
             this.gbSourceViews.TabIndex = 91;
             this.gbSourceViews.TabStop = false;
             this.gbSourceViews.Text = "Source Views";
+            // 
+            // gbFilters
+            // 
+            this.gbFilters.Controls.Add(this.lblUserFilter);
+            this.gbFilters.Controls.Add(this.cboUserFilter);
+            this.gbFilters.Controls.Add(this.cboViewClasses);
+            this.gbFilters.Controls.Add(this.chkShowActiveViews);
+            this.gbFilters.Location = new System.Drawing.Point(6, 20);
+            this.gbFilters.Name = "gbFilters";
+            this.gbFilters.Size = new System.Drawing.Size(493, 36);
+            this.gbFilters.TabIndex = 64;
+            this.gbFilters.TabStop = false;
+            this.gbFilters.Text = "View Filters";
+            // 
+            // lblUserFilter
+            // 
+            this.lblUserFilter.AutoSize = true;
+            this.lblUserFilter.Location = new System.Drawing.Point(261, 17);
+            this.lblUserFilter.Name = "lblUserFilter";
+            this.lblUserFilter.Size = new System.Drawing.Size(77, 13);
+            this.lblUserFilter.TabIndex = 3;
+            this.lblUserFilter.Text = "Filter By User:";
+            // 
+            // cboUserFilter
+            // 
+            this.cboUserFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboUserFilter.FormattingEnabled = true;
+            this.cboUserFilter.Location = new System.Drawing.Point(344, 12);
+            this.cboUserFilter.Name = "cboUserFilter";
+            this.cboUserFilter.Size = new System.Drawing.Size(121, 21);
+            this.cboUserFilter.TabIndex = 2;
+            this.cboUserFilter.SelectedIndexChanged += new System.EventHandler(this.cboUserFilter_SelectedIndexChanged);
+            // 
+            // cboViewClasses
+            // 
+            this.cboViewClasses.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboViewClasses.FormattingEnabled = true;
+            this.cboViewClasses.Location = new System.Drawing.Point(134, 12);
+            this.cboViewClasses.Name = "cboViewClasses";
+            this.cboViewClasses.Size = new System.Drawing.Size(121, 21);
+            this.cboViewClasses.TabIndex = 1;
+            this.cboViewClasses.SelectedIndexChanged += new System.EventHandler(this.cboViewTypes_SelectedIndexChanged);
+            // 
+            // chkShowActiveViews
+            // 
+            this.chkShowActiveViews.AutoSize = true;
+            this.chkShowActiveViews.Location = new System.Drawing.Point(7, 14);
+            this.chkShowActiveViews.Name = "chkShowActiveViews";
+            this.chkShowActiveViews.Size = new System.Drawing.Size(121, 17);
+            this.chkShowActiveViews.TabIndex = 0;
+            this.chkShowActiveViews.Text = "Show Active Views";
+            this.chkShowActiveViews.UseVisualStyleBackColor = true;
+            this.chkShowActiveViews.CheckedChanged += new System.EventHandler(this.chkShowActiveViews_CheckedChanged);
             // 
             // lvSourceViews
             // 
@@ -131,12 +188,13 @@
             this.lvSourceViews.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.allViewName,
             this.allViewType,
-            this.allViewIsActive});
+            this.allViewIsActive,
+            this.allViewOwner});
             this.lvSourceViews.FullRowSelect = true;
             this.lvSourceViews.HideSelection = false;
-            this.lvSourceViews.Location = new System.Drawing.Point(4, 58);
+            this.lvSourceViews.Location = new System.Drawing.Point(4, 77);
             this.lvSourceViews.Name = "lvSourceViews";
-            this.lvSourceViews.Size = new System.Drawing.Size(495, 187);
+            this.lvSourceViews.Size = new System.Drawing.Size(495, 204);
             this.lvSourceViews.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.lvSourceViews.TabIndex = 63;
             this.lvSourceViews.UseCompatibleStateImageBehavior = false;
@@ -157,6 +215,11 @@
             // 
             this.allViewIsActive.Text = "View State";
             this.allViewIsActive.Width = 130;
+            // 
+            // allViewOwner
+            // 
+            this.allViewOwner.Text = "Owner Name";
+            this.allViewOwner.Width = 130;
             // 
             // tsMain
             // 
@@ -310,9 +373,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gbSourceViewLayout.Controls.Add(this.lvSourceViewLayoutPreview);
             this.gbSourceViewLayout.Enabled = false;
-            this.gbSourceViewLayout.Location = new System.Drawing.Point(292, 342);
+            this.gbSourceViewLayout.Location = new System.Drawing.Point(292, 378);
             this.gbSourceViewLayout.Name = "gbSourceViewLayout";
-            this.gbSourceViewLayout.Size = new System.Drawing.Size(505, 249);
+            this.gbSourceViewLayout.Size = new System.Drawing.Size(505, 213);
             this.gbSourceViewLayout.TabIndex = 98;
             this.gbSourceViewLayout.TabStop = false;
             this.gbSourceViewLayout.Text = "Source view layout";
@@ -326,31 +389,10 @@
             this.lvSourceViewLayoutPreview.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lvSourceViewLayoutPreview.Location = new System.Drawing.Point(6, 19);
             this.lvSourceViewLayoutPreview.Name = "lvSourceViewLayoutPreview";
-            this.lvSourceViewLayoutPreview.Size = new System.Drawing.Size(493, 224);
+            this.lvSourceViewLayoutPreview.Size = new System.Drawing.Size(493, 188);
             this.lvSourceViewLayoutPreview.TabIndex = 66;
             this.lvSourceViewLayoutPreview.UseCompatibleStateImageBehavior = false;
             this.lvSourceViewLayoutPreview.View = System.Windows.Forms.View.Details;
-            // 
-            // gbFilters
-            // 
-            this.gbFilters.Controls.Add(this.chkShowActiveViews);
-            this.gbFilters.Location = new System.Drawing.Point(6, 20);
-            this.gbFilters.Name = "gbFilters";
-            this.gbFilters.Size = new System.Drawing.Size(493, 32);
-            this.gbFilters.TabIndex = 64;
-            this.gbFilters.TabStop = false;
-            this.gbFilters.Text = "View Filters";
-            // 
-            // chkShowActiveViews
-            // 
-            this.chkShowActiveViews.AutoSize = true;
-            this.chkShowActiveViews.Location = new System.Drawing.Point(7, 14);
-            this.chkShowActiveViews.Name = "chkShowActiveViews";
-            this.chkShowActiveViews.Size = new System.Drawing.Size(121, 17);
-            this.chkShowActiveViews.TabIndex = 0;
-            this.chkShowActiveViews.Text = "Show Active Views";
-            this.chkShowActiveViews.UseVisualStyleBackColor = true;
-            this.chkShowActiveViews.CheckedChanged += new System.EventHandler(this.chkShowActiveViews_CheckedChanged);
             // 
             // ViewTransferTool
             // 
@@ -369,11 +411,11 @@
             this.Size = new System.Drawing.Size(800, 600);
             this.gbEntities.ResumeLayout(false);
             this.gbSourceViews.ResumeLayout(false);
+            this.gbFilters.ResumeLayout(false);
+            this.gbFilters.PerformLayout();
             this.tsMain.ResumeLayout(false);
             this.tsMain.PerformLayout();
             this.gbSourceViewLayout.ResumeLayout(false);
-            this.gbFilters.ResumeLayout(false);
-            this.gbFilters.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -409,6 +451,10 @@
         private System.Windows.Forms.ColumnHeader allViewIsActive;
         private System.Windows.Forms.GroupBox gbFilters;
         private System.Windows.Forms.CheckBox chkShowActiveViews;
+        private System.Windows.Forms.ComboBox cboViewClasses;
+        private System.Windows.Forms.ComboBox cboUserFilter;
+        private System.Windows.Forms.Label lblUserFilter;
+        private System.Windows.Forms.ColumnHeader allViewOwner;
 
     }
 }
