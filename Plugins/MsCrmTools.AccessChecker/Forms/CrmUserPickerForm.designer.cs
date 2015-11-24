@@ -35,13 +35,13 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.lvUsers = new System.Windows.Forms.ListView();
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.txtSearchFilter = new System.Windows.Forms.TextBox();
             this.btnSearch = new System.Windows.Forms.Button();
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // button_Validate
@@ -91,9 +91,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lvUsers.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader3,
             this.columnHeader1,
             this.columnHeader2,
-            this.columnHeader3,
             this.columnHeader4});
             this.lvUsers.FullRowSelect = true;
             this.lvUsers.Location = new System.Drawing.Point(12, 40);
@@ -109,6 +109,11 @@
             this.lvUsers.SelectedIndexChanged += new System.EventHandler(this.ListViewUsersSelectedIndexChanged);
             this.lvUsers.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListViewUsersMouseDoubleClick);
             // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "User Name";
+            this.columnHeader3.Width = 150;
+            // 
             // columnHeader1
             // 
             this.columnHeader1.Text = "Last name";
@@ -118,6 +123,11 @@
             // 
             this.columnHeader2.Text = "First name";
             this.columnHeader2.Width = 150;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Business Unit";
+            this.columnHeader4.Width = 130;
             // 
             // imageList1
             // 
@@ -145,16 +155,6 @@
             this.btnSearch.Text = "Go";
             this.btnSearch.UseVisualStyleBackColor = true;
             this.btnSearch.Click += new System.EventHandler(this.ButtonSearchClick);
-            // 
-            // columnHeader3
-            // 
-            this.columnHeader3.Text = "User Name";
-            this.columnHeader3.Width = 150;
-            // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "Business Unit";
-            this.columnHeader4.Width = 130;
             // 
             // CrmUserPickerForm
             // 
