@@ -275,30 +275,13 @@ namespace DamSim.ViewTransferTool
             List<Entity> viewsList = ViewHelper.RetrieveViews(entityLogicalName, entitiesCache, service);
             viewsList.AddRange(ViewHelper.RetrieveUserViews(entityLogicalName, entitiesCache, service));
 
+            HashSet<string> viewOwners = new HashSet<string>();
+
             foreach (Entity view in viewsList)
             {
-                bool display = true;
-
-                var item = new ListViewItem(view["name"].ToString());
-                item.Tag = view;
-
-                display = ShouldDisplayItem(item);
-
-                if (display)
+                var item = new CrmViewListViewItem(view);
+                if (item.HasRequiredFields() && ViewPassesFilters(item))
                 {
-                    if (view.Contains("statecode"))
-                    {
-                        int statecodeValue = ((OptionSetValue)view["statecode"]).Value;
-                        switch (statecodeValue)
-                        {
-                            case ViewHelper.VIEW_STATECODE_ACTIVE:
-                                item.SubItems.Add("Active");
-                                break;
-                            case ViewHelper.VIEW_STATECODE_INACTIVE:
-                                item.SubItems.Add("Inactive");
-                                break;
-                        }
-                    }
                     // Add view to each list of views (source and target)
                     ListViewItem clonedItem = (ListViewItem)item.Clone();
                     ListViewDelegates.AddItem(lvSourceViews, item);
@@ -310,9 +293,13 @@ namespace DamSim.ViewTransferTool
                         clonedItem.ToolTipText = "This view has not been defined as customizable";
                     }
 
-                    //ListViewDelegates.AddItem(lvTargetViews, clonedItem);
+                    viewOwners.Add(item.ViewOwner.Name);
                 }
             }
+
+            var owners = viewOwners.ToArray();
+            Array.Sort(owners);
+            ComboboxDelegates.AddRange(cboUserFilter, owners);
         }
 
         private void BwFillViewsRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -623,6 +610,8 @@ namespace DamSim.ViewTransferTool
 
         #endregion Publish all
 
+        #region Filters
+        
         private void chkShowActiveViews_CheckedChanged(object sender, EventArgs e)
         {
             PopulateSourceViews();
@@ -631,84 +620,55 @@ namespace DamSim.ViewTransferTool
         private void ResetFilterControls()
         {
             chkShowActiveViews.CheckedChanged -= chkShowActiveViews_CheckedChanged;
-            chkShowActiveViews.Checked = false;
+            CheckBoxDelegates.SetCheckedState(chkShowActiveViews, false);
             chkShowActiveViews.CheckedChanged += chkShowActiveViews_CheckedChanged;
+
+            cboViewClasses.SelectedIndexChanged -= cboViewTypes_SelectedIndexChanged;
+            string[] viewTypesList = { "All Views", "System Views", "User Views" };
+            if (cboViewClasses.Items.Count == 0)
+            {
+                ComboboxDelegates.AddRange(cboViewClasses, viewTypesList);
+            }
+            ComboboxDelegates.SetSelectedIndex(cboViewClasses,  ComboboxDelegates.GetIndexOf(cboViewClasses, "All Views"));
+            cboViewClasses.SelectedIndexChanged += cboViewTypes_SelectedIndexChanged;
+
+            cboUserFilter.SelectedIndexChanged -= cboUserFilter_SelectedIndexChanged;
+            ComboboxDelegates.ClearItems(cboUserFilter);
+            cboUserFilter.SelectedIndexChanged += cboUserFilter_SelectedIndexChanged;
         }
 
-        private bool ShouldDisplayItem(ListViewItem item)
+        public bool ViewPassesFilters(CrmViewListViewItem view)
         {
             bool display = true;
-            var view = (Entity)item.Tag;
-
-            #region Gestion de l'image associée à la vue
-
-            switch ((int)view["querytype"])
-            {
-                case ViewHelper.VIEW_BASIC:
-                    {
-                        if (view.LogicalName == "savedquery")
-                        {
-                            if ((bool)view["isdefault"])
-                            {
-                                item.SubItems.Add("Default public view");
-                                item.ImageIndex = 3;
-                            }
-                            else
-                            {
-                                item.SubItems.Add("Public view");
-                                item.ImageIndex = 0;
-                            }
-                        }
-                        else
-                        {
-                            item.SubItems.Add("User view");
-                            item.ImageIndex = 6;
-                        }
-                    }
-                    break;
-
-                case ViewHelper.VIEW_ADVANCEDFIND:
-                    {
-                        item.SubItems.Add("Advanced find view");
-                        item.ImageIndex = 1;
-                    }
-                    break;
-
-                case ViewHelper.VIEW_ASSOCIATED:
-                    {
-                        item.SubItems.Add("Associated view");
-                        item.ImageIndex = 2;
-                    }
-                    break;
-
-                case ViewHelper.VIEW_QUICKFIND:
-                    {
-                        item.SubItems.Add("QuickFind view");
-                        item.ImageIndex = 5;
-                    }
-                    break;
-
-                case ViewHelper.VIEW_SEARCH:
-                    {
-                        item.SubItems.Add("Lookup view");
-                        item.ImageIndex = 4;
-                    }
-                    break;
-
-                default:
-                    {
-                        return false;
-                    }
-            }
-
-            #endregion Gestion de l'image associée à la vue
 
             #region Filters
 
             if (chkShowActiveViews.Checked)
             {
-                var viewStateCode = view.GetAttributeValue<OptionSetValue>("statecode").Value;
+                var viewStateCode = view.CrmViewEntity.GetAttributeValue<OptionSetValue>("statecode").Value;
                 if (viewStateCode == ViewHelper.VIEW_STATECODE_INACTIVE)
+                {
+                    return false;
+                }
+            }
+
+            var selectedItem = (string)ComboboxDelegates.GetSelectedItem(cboViewClasses);
+            if (selectedItem != "All Views")
+            {
+                if (selectedItem == "User Views" && view.CrmViewEntity.LogicalName != "userquery")
+                {
+                    return false;
+                }
+                if (selectedItem == "System Views" && view.CrmViewEntity.LogicalName != "savedquery")
+                {
+                    return false;
+                }
+            }
+
+            var selectedUserName = (string)ComboboxDelegates.GetSelectedItem(cboUserFilter);
+            if (selectedUserName != null)
+            {
+                if (view.ViewOwner.Name != selectedUserName)
                 {
                     return false;
                 }
@@ -717,6 +677,245 @@ namespace DamSim.ViewTransferTool
             #endregion
 
             return display;
+        }
+
+        private void cboViewTypes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            PopulateSourceViews();
+        }
+
+        private void cboUserFilter_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            PopulateSourceViews();
+        }
+        
+        #endregion
+    }
+
+    public class CrmViewListViewItem : ListViewItem
+    {
+        private Entity entity;
+        public Entity CrmViewEntity
+        {
+            get
+            {
+                return entity;
+            }
+            private set
+            {
+                this.entity = value;
+                this.Tag = value;
+            }
+        }
+        public CrmViewType ViewType { get; private set; }
+
+        private EntityReference viewOwner;
+        public EntityReference ViewOwner
+        {
+            get
+            {
+                if (entity.LogicalName == "userquery")
+                {
+                    return entity.GetAttributeValue<EntityReference>("ownerid");
+                }
+                else
+                {
+                    return entity.GetAttributeValue<EntityReference>("createdby");
+                }
+            }
+            private set
+            {
+                viewOwner = value;
+            }
+        }
+        public CrmViewListViewItem() { }
+
+        public CrmViewListViewItem(Entity view)
+        {
+            if (view.LogicalName == "savedquery" || view.LogicalName == "userquery")
+            {
+                this.CrmViewEntity = view;
+                this.ViewType = new CrmViewType(view);
+                if (this.HasRequiredFields())
+                {
+                    GenerateListViewItemForView(this.CrmViewEntity);
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Argument entity must have LogicalName \"savedquery\" or \"userquery\"");
+            }
+        }
+
+        private void GenerateListViewItemForView(Entity view)
+        {
+            // the order the SubItems are added is very important
+            this.SubItems.Clear();
+
+            // View Name
+            this.Text = view["name"].ToString(); // for first column
+            this.Tag = view;
+
+            // View Type
+            this.SubItems.Add(ViewType.ViewTypeName);
+            this.ImageIndex = ViewType.ImageIndex;
+
+            // View State
+            switch (((OptionSetValue)view["statecode"]).Value)
+            {
+                case ViewHelper.VIEW_STATECODE_ACTIVE:
+                    this.SubItems.Add("Active");
+                    break;
+                case ViewHelper.VIEW_STATECODE_INACTIVE:
+                    this.SubItems.Add("Inactive");
+                    break;
+            }
+
+            // View Owner
+            this.SubItems.Add(ViewOwner.Name);
+        }
+
+        public bool HasRequiredFields()
+        {
+            bool display = true;
+
+            if (this.CrmViewEntity.GetAttributeValue<string>("name") == null)
+            {
+                return false;
+            }
+
+            if (this.CrmViewEntity.GetAttributeValue<OptionSetValue>("statecode") == null)
+            {
+                return false;
+            }
+
+            if (this.CrmViewEntity.GetAttributeValue<int?>("querytype") == null)
+            {
+                return false;
+            }
+
+            if (this.CrmViewEntity.LogicalName == "savedquery")
+            {
+                if (this.CrmViewEntity.GetAttributeValue<bool?>("isdefault") == null
+                    || this.CrmViewEntity.GetAttributeValue<EntityReference>("createdby") == null)
+                {
+                    return false;
+                }
+            }
+
+            if (this.CrmViewEntity.LogicalName == "userquery")
+            {
+                if (this.CrmViewEntity.GetAttributeValue<EntityReference>("ownerid") == null)
+                {
+                    return false;
+                }
+            }
+
+            if (this.ViewType.ViewTypeName == null)
+            {
+                return false;
+            }
+
+            return display;
+        }
+
+        /// <summary>
+        /// Contains information about the type of view 
+        /// </summary>
+        public class CrmViewType
+        {
+            public string ViewTypeName { get; private set; }
+            /// <summary>
+            /// CRM type code for this view type
+            /// </summary>
+            public int ViewTypeCode { get; private set; }
+            /// <summary>
+            /// Index for the image associated with this view.
+            /// </summary>
+            public int ImageIndex { get; private set; }
+
+            public CrmViewType(Entity view)
+            {
+                if (view.LogicalName == "savedquery" || view.LogicalName == "userquery")
+                {
+                    SetViewTypeDetails(view);
+                }
+            }
+
+            public bool IsValid()
+            {
+                return !String.IsNullOrEmpty(ViewTypeName)
+                    && !String.IsNullOrWhiteSpace(ViewTypeName)
+                    && ViewTypeCode != null
+                    && ImageIndex != null;
+            }
+
+            private void SetViewTypeDetails(Entity view)
+            {
+                #region Gestion de l'image associée à la vue
+
+                switch ((int)view["querytype"])
+                {
+                    case ViewHelper.VIEW_BASIC:
+                        {
+                            if (view.LogicalName == "savedquery")
+                            {
+                                if ((bool)view["isdefault"])
+                                {
+                                    this.ViewTypeName = "Default public view";
+                                    this.ImageIndex = 3;
+                                }
+                                else
+                                {
+                                    this.ViewTypeName = "Public view";
+                                    this.ImageIndex = 0;
+                                }
+                            }
+                            else
+                            {
+                                this.ViewTypeName = "User view";
+                                this.ImageIndex = 6;
+                            }
+                        }
+                        break;
+
+                    case ViewHelper.VIEW_ADVANCEDFIND:
+                        {
+                            this.ViewTypeName = "Advanced find view";
+                            this.ImageIndex = 1;
+                        }
+                        break;
+
+                    case ViewHelper.VIEW_ASSOCIATED:
+                        {
+                            this.ViewTypeName = "Associated view";
+                            this.ImageIndex = 2;
+                        }
+                        break;
+
+                    case ViewHelper.VIEW_QUICKFIND:
+                        {
+                            this.ViewTypeName = "QuickFind view";
+                            this.ImageIndex = 5;
+                        }
+                        break;
+
+                    case ViewHelper.VIEW_SEARCH:
+                        {
+                            this.ViewTypeName = "Lookup view";
+                            this.ImageIndex = 4;
+                        }
+                        break;
+
+                    default:
+                        {
+                            // should not get here...
+                            break;
+                        }
+                }
+
+                #endregion Gestion de l'image associée à la vue
+            }
         }
     }
 }
