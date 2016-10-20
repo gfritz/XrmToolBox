@@ -27,5 +27,61 @@ namespace MsCrmTools.UserSettingsUtility.AppCode
         public string WorkdayStartTime { get; set; }
 
         public string WorkdayStopTime { get; set; }
+        public UserSettingsFormatting FormatCodes { get; set; }
+    }
+
+    internal class UserSettingsFormatting
+    {
+        NumberFormatting NumberFormatting { get; set; }
+        CurrencyFormatting CurrencyFormatting { get; set; }
+        TimeFormatting TimeFormatting { get; set; }
+        DateFormatting DateFormatting { get; set; }
+    }
+
+    enum DecimalSymbol { }
+    enum DigitGroupingSybmol { }
+    enum DigitGroups { }
+    enum NegativeNumbers { }
+
+    internal class NumberFormatting
+    {
+        DecimalSymbol DecimalSymbol;
+        DigitGroupingSybmol DigitGroupingSymbol;
+        DigitGroups DigitGroups;
+        NegativeNumbers NegativeNumbers;
+    }
+
+    enum CurrencyFormat { }
+    enum NegativeCurrencyFormat { }
+
+    internal class CurrencyFormatting
+    {
+        CurrencyFormat CurrencyFormat;
+        NegativeCurrencyFormat NegativeCurrencyFormat;
+    }
+
+    enum TimeFormat { }
+    enum TimeSeparator { }
+    enum AMSymbol { }
+    enum PMSymbol { }
+
+    internal class TimeFormatting
+    {
+        TimeFormat TimeFormat;
+        TimeSeparator TimeSeparator;
+        AMSymbol AMSymbol;
+        PMSymbol PMSymbol;
+    }
+
+    enum ShortDateFormat { }
+    enum DateSeparator { }
+    enum LongDateFormat { }
+
+    internal class DateFormatting
+    {
+        bool ShowWeekNumbersOnCalendarViews;
+        ShortDateFormat ShortDateFormat;
+        DateSeparator DateSeparator;
+        LongDateFormat LongDateFormat;
     }
 }
